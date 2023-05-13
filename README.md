@@ -11,6 +11,7 @@ Before you can run this project, you must have the following tools installed:
 
 - Terraform v1.2 or higher
 - AWS CLI v2 or higher
+- A Domain name in 
 
 
 You must also have AWS credentials set up on your local machine. <br>
@@ -21,21 +22,22 @@ Follow these steps to get started with this Terraform project:aws sts get-caller
 
 1. Clone the repository
 2. Navigate to the project directory
-3. cd to okteto-vpc (optional if no VPC is created)
-4. Edit the vpc-module.tf `azs` to the region of your choice 
-4. Run `terraform init` to initialize the project
+3. cd eks_managed_node_group edit main.tf under locals change "region" to the region you would like to deploy
+4. Run `terraform init` `terraform plan` to initialize the project and validate configuration
 5. Run `terraform apply` to create the resources in AWS
-6. Copy the outputs 
-7. Return to project Directory 
-8. Edit the varables.tf for control_plane_subnet_ids (All Public and Private IDs)
-9. Edit the varables.tf for subnet_ids (Private IDs)
-10. Edit the varables.tf for vpc_id
-11. Run `terraform init` to initialize the project
-12. Run `terraform apply` to create the resources in AWS
-13. Wait for the terraform apply command to finish executing
-14. Run `aws sts get-caller-identity`
-15. Run `aws eks update-kubeconfig --region region-code --name okteto-environments` (where region-code is the region of your VPC)
-16. Test `kubectl get svc`
+6. Wait for the terraform apply command to finish executing
+7. Run `aws sts get-caller-identity`
+8. Run `aws eks update-kubeconfig --region `region-code` --name okteto-environments` (where region-code is the region of your VPC)
+9. Test `kubectl get svc`
+
+### you now have an enterprise EKS Cluster complete with the minimum requirements for Okteto 
+1. New Okteto Development VPC
+1. All IAM roles and policies for creating and running an EKS cluster
+1. Node Group and auto-scalling 
+    a. Node's with 250GB volumes
+    a. Amazon Linux 
+    a. instance type 6i.xlarge
+1. EKS Cluster named okteto-enviironments running Kubernetes Version 1.25
 
 ## Installing Okteto
 1. 
