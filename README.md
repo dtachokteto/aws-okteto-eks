@@ -55,4 +55,6 @@ To destroy the resources created by this Terraform project, run `terraform destr
 ## Future update
 - Terraform the s3 policy to s3 user group.  
 - Create new diagram
+- Change the name of the S3 bucket
+- Add Domain and certificate from AWS
 

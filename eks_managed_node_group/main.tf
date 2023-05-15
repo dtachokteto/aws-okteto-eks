@@ -37,7 +37,7 @@ locals {
 module "s3_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket = "s3-${replace(basename(path.cwd), "_", "-")}"
+  bucket = "okteto-bucket-${data.aws_caller_identity.current.account_id}"
   acl    = "private"
 
   control_object_ownership = true
