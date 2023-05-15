@@ -20,18 +20,39 @@ data "aws_availability_zones" "available" {}
 locals {
   name            = "okteto-environments"
   cluster_version = "1.25"
-  region          = "eu-central-1"
+  region          = var.region
 
   vpc_cidr = "10.0.0.0/16"
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   tags = {
     Example    = local.name
-    GithubRepo = "terraform-aws-eks"
-    GithubOrg  = "terraform-aws-modules"
+    GithubRepo = "aws-okteto-eks"
+    GithubOrg  = "Okteto"
   }
 }
+################################################################################
+# S3 Module
+################################################################################
+module "s3_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws"
 
+  bucket = "s3-${replace(basename(path.cwd), "_", "-")}"
+  acl    = "private"
+
+  control_object_ownership = true
+  object_ownership         = "ObjectWriter"
+
+  versioning = {
+    enabled = false
+  }
+}
+ # Create bucket user
+resource "aws_iam_user" "okteto-s3" {
+    name = "okteto-s3"
+}
+
+ 
 ################################################################################
 # EKS Module
 ################################################################################

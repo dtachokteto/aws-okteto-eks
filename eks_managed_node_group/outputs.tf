@@ -209,3 +209,11 @@ output "aws_auth_configmap_yaml" {
   description = "Formatted yaml output for base aws-auth configmap containing roles used in cluster node groups/fargate profiles"
   value       = module.eks.aws_auth_configmap_yaml
 }
+
+output "user_arn" {
+  value = aws_iam_user.okteto-s3.*.arn
+}
+# output "arn" {
+#  description = "The ARN assigned by AWS to this policy"
+#  value       = try(aws_iam_policy.policy[0].arn, "")
+#}
