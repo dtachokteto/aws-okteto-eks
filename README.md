@@ -42,7 +42,12 @@ Follow these steps to get started with this Terraform project:aws sts get-caller
 1. EKS Cluster named okteto-enviironments running Kubernetes Version 1.25
 
 ## Installing Okteto
-1. Get the arn from the s3 bucket, create the S3 Policy and attach it to okteto-s3 user. 
+1. Get the arn from the s3 bucket, create the S3 Policy and attach it to okteto-s3 user. The arn should also be in the terraform output
+1. change directory to the root of the repository and folder s3-policy-json (`cd ../s3-policy-json`)
+1. edit the s3-user-policy.json file with your bucket name 
+1. Run `aws iam create-policy --policy-name okteto-user-s3 --policy-document file://s3-user-policy.json`
+1. to attach the policy to the okteto-s3 user get the policy Arn from the output and run: `aws-okteto-eks % aws iam attach-user-policy --policy-arn <instert policy arn> --user-name okteto-s3`
+1. 
 
 # Project Details
 
