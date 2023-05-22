@@ -47,6 +47,8 @@ Follow these steps to get started with this Terraform project:aws sts get-caller
 1. edit the s3-user-policy.json file with your bucket name 
 1. Run `aws iam create-policy --policy-name okteto-user-s3 --policy-document file://s3-user-policy.json`
 1. to attach the policy to the okteto-s3 user get the policy Arn from the output and run: `aws-okteto-eks % aws iam attach-user-policy --policy-arn <instert policy arn> --user-name okteto-s3`
+1. change directory to the root of the repository and folder okteto-helm (`cd ../okteto-helm`)
+1. edit config.yaml with your License key, subdomain, and Cluster Endpoint. save
 1. 
 
 # Project Details
@@ -55,7 +57,8 @@ Follow these steps to get started with this Terraform project:aws sts get-caller
 1. terraform-aws-eks repository is inserted in the eks_managed_node_group for easy upgrading
 
 ## Clean Up
-To destroy the resources created by this Terraform project, run `terraform destroy`. This will remove the VPC, subnets, security groups, EC2 bast , EKS cluster
+1. To destroy the resources created by this Terraform project, run `terraform destroy`. This will remove the VPC, subnets, security groups, EC2 bast , EKS cluster
+1. aws iam delete-policy --policy-arn arn:aws:iam::0123456789101:policy/okteto-user-s
 
 ## Future update
 - Terraform the s3 policy to s3 user group.  

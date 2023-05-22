@@ -327,11 +327,11 @@ module "vpc" {
 
   azs             = local.azs
   private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k)]
-  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 48)]
-  intra_subnets   = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 52)]
+  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 8)]
+  intra_subnets   = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 20)]
 
-  enable_ipv6                     = true
-  assign_ipv6_address_on_creation = true
+  enable_ipv6                     = false
+  assign_ipv6_address_on_creation = false
   create_egress_only_igw          = true
 
   public_subnet_ipv6_prefixes  = [0, 1, 2]

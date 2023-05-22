@@ -1,0 +1,16 @@
+license: 1234567890ABCD==
+subdomain: okteto.davidtacheny.com  
+cluster:
+  endpoint: "https://9DEDDB0433B48487EE720B9273A00B1E.gr7.eu-central-1.eks.amazonaws.com"
+
+buildkit:
+  ingress:
+    enabled: false
+  service:
+    type: LoadBalancer
+    
+ingress-nginx:
+  controller:
+    service:
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-type: nlb
