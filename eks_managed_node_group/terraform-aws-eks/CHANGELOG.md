@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file.
 
+### [19.15.3](https://github.com/terraform-aws-modules/terraform-aws-eks/compare/v19.15.2...v19.15.3) (2023-06-09)
+
+
+### Bug Fixes
+
+* Snapshot permissions issue for Karpenter submodule ([#2649](https://github.com/terraform-aws-modules/terraform-aws-eks/issues/2649)) ([6217d0e](https://github.com/terraform-aws-modules/terraform-aws-eks/commit/6217d0eaab4c864ec4d40a31538e78a7fbcee5e3))
+
+### [19.15.2](https://github.com/terraform-aws-modules/terraform-aws-eks/compare/v19.15.1...v19.15.2) (2023-05-30)
+
+
+### Bug Fixes
+
+* Ensure `isra_tag_values` can be tried before defaulting to `cluster_name` on Karpenter module ([#2631](https://github.com/terraform-aws-modules/terraform-aws-eks/issues/2631)) ([6c56e2a](https://github.com/terraform-aws-modules/terraform-aws-eks/commit/6c56e2ad20057a5672526b5484df96806598a4e2))
+
+### [19.15.1](https://github.com/terraform-aws-modules/terraform-aws-eks/compare/v19.15.0...v19.15.1) (2023-05-24)
+
+
+### Bug Fixes
+
+* Revert changes to ignore `role_last_used` ([#2629](https://github.com/terraform-aws-modules/terraform-aws-eks/issues/2629)) ([e23139a](https://github.com/terraform-aws-modules/terraform-aws-eks/commit/e23139ad2da0c31c8aa644ae0516ba9ee2a66399))
+
+## [19.15.0](https://github.com/terraform-aws-modules/terraform-aws-eks/compare/v19.14.0...v19.15.0) (2023-05-24)
+
+
+### Features
+
+* Ignore changes to *.aws_iam_role.*.role_last_used ([#2628](https://github.com/terraform-aws-modules/terraform-aws-eks/issues/2628)) ([f8ea3d0](https://github.com/terraform-aws-modules/terraform-aws-eks/commit/f8ea3d08adbc4abfb18a77ad44e30b93cd05c050))
+
+## [19.14.0](https://github.com/terraform-aws-modules/terraform-aws-eks/compare/v19.13.1...v19.14.0) (2023-05-17)
+
+
+### Features
+
+* Add irsa_tag_values variable ([#2584](https://github.com/terraform-aws-modules/terraform-aws-eks/issues/2584)) ([aa3bdf1](https://github.com/terraform-aws-modules/terraform-aws-eks/commit/aa3bdf1c19747bca7067c6e49c071ae80a9ca5e5))
+
 ### [19.13.1](https://github.com/terraform-aws-modules/terraform-aws-eks/compare/v19.13.0...v19.13.1) (2023-04-18)
 
 

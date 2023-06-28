@@ -19,7 +19,7 @@ data "aws_availability_zones" "available" {}
 
 locals {
   name            = "okteto-environments"
-  cluster_version = "1.25"
+  cluster_version = "1.26"
   region          = var.region
 
   vpc_cidr = "10.0.0.0/16"
@@ -27,10 +27,11 @@ locals {
 
   tags = {
     Example    = local.name
-    GithubRepo = "aws-okteto-eks"
-    GithubOrg  = "Okteto"
+    GithubRepo = "terraform-aws-eks"
+    GithubOrg  = "terraform-aws-modules"
   }
 }
+
 ################################################################################
 # S3 Module
 ################################################################################
@@ -51,8 +52,6 @@ module "s3_bucket" {
 resource "aws_iam_user" "okteto-s3" {
     name = "okteto-s3"
 }
-
- 
 ################################################################################
 # EKS Module
 ################################################################################
@@ -115,96 +114,9 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
-    # Default node group - as provided by AWS EKS
-    #default_node_group = {
-      # By default, the module creates a launch template to ensure tags are propagated to instances, etc.,
-      # so we need to disable it to use the default template provided by the AWS EKS managed node group service
-     # use_custom_launch_template = true
-
-      # disk_size = 250
-
-      # Remote access cannot be specified with a launch template
-      #remote_access = {
-      #  ec2_ssh_key               = module.key_pair.key_pair_name
-      #  source_security_group_ids = [aws_security_group.remote_access.id]
-      #}
-    #}
-
-    ## Default node group - as provided by AWS EKS using Bottlerocket
-    #bottlerocket_default = {
-    #  # By default, the module creates a launch template to ensure tags are propagated to instances, etc.,
-    #  # so we need to disable it to use the default template provided by the AWS EKS managed node group service
-    #  use_custom_launch_template = false
-    #
-    #  ami_type = "BOTTLEROCKET_x86_64"
-    #  platform = "bottlerocket"
-    #}
-
-    ## Adds to the AWS provided user data
-    #bottlerocket_add = {
-    #  ami_type = "BOTTLEROCKET_x86_64"
-    #  platform = "bottlerocket"
-    #
-    #  # This will get added to what AWS provides
-    #  bootstrap_extra_args = <<-EOT
-    #    # extra args added
-    #    [settings.kernel]
-    #    lockdown = "integrity"
-    #  EOT
-    #}
-
-    # Custom AMI, using module provided bootstrap data
-    #bottlerocket_custom = {
-    #  # Current bottlerocket AMI
-    #  ami_id   = data.aws_ami.eks_default_bottlerocket.image_id
-    #  platform = "bottlerocket"
-    #
-    #  # Use module user data template to bootstrap
-    #  enable_bootstrap_user_data = true
-    #  # This will get added to the template
-    #  bootstrap_extra_args = <<-EOT
-    #    # The admin host container provides SSH access and runs with "superpowers".
-    #    # It is disabled by default, but can be disabled explicitly.
-    #    [settings.host-containers.admin]
-    #    enabled = false
-    #
-    #    # The control host container provides out-of-band access via SSM.
-    #    # It is enabled by default, and can be disabled if you do not expect to use SSM.
-    #    # This could leave you with no way to access the API and change settings on an existing node!
-    #    [settings.host-containers.control]
-    #    enabled = true
-    #
-    #    # extra args added
-    #    [settings.kernel]
-    #    lockdown = "integrity"
-    #
-    #    [settings.kubernetes.node-labels]
-    #    label1 = "foo"
-    #    label2 = "bar"
-    #
-    #    [settings.kubernetes.node-taints]
-    #    dedicated = "experimental:PreferNoSchedule"
-    #    special = "true:NoSchedule"
-    #  EOT
-    #}
-
-    ## Use a custom AMI
-    #custom_ami = {
-    #  ami_type = "AL2_ARM_64"
-    #  # Current default AMI used by managed node groups - pseudo "custom"
-    #  ami_id = data.aws_ami.eks_default_arm.image_id
-
-      # This will ensure the bootstrap user data is used to join the node
-      # By default, EKS managed node groups will not append bootstrap script;
-      # this adds it back in using the default template provided by the module
-      # Note: this assumes the AMI provided is an EKS optimized AMI derivative
-    #  enable_bootstrap_user_data = true
-
-    #  instance_types = ["t4g.medium"]
-    #}
-
+   
     # Complete
-    complete = {
+     complete = {
       name            = "complete-eks-mng"
       use_name_prefix = true
 
@@ -227,18 +139,19 @@ module "eks" {
 
       capacity_type        = "SPOT"
       force_update_version = true
-      instance_types       = ["m6i.xlarge"]
+      instance_types       = ["m6i.large"]
       labels = {
         GithubRepo = "terraform-aws-eks"
         GithubOrg  = "terraform-aws-modules"
       }
 
-      # taints = [
-      #  {
-      #    key    = "dedicated"
-      #    value  = "gpuGroup"
-      #    effect = "NO_SCHEDULE"
-       # }
+      taints = [
+        {
+          key    = "dedicated"
+          value  = "gpuGroup"
+          effect = "NO_SCHEDULE"
+        }
+      ]
 
       update_config = {
         max_unavailable_percentage = 33 # or set `max_unavailable`
@@ -277,19 +190,19 @@ module "eks" {
       iam_role_use_name_prefix = false
       iam_role_description     = "EKS managed node group complete example role"
       iam_role_tags = {
-        Purpose = "Protector of the kubelet"
+        Purpose = "okteto-ia-role-tag"
       }
       iam_role_additional_policies = {
         AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
         additional                         = aws_iam_policy.node_additional.arn
       }
 
-      #schedules = {
+      # schedules = {
       #  scale-up = {
       #    min_size     = 2
       #    max_size     = "-1" # Retains current max size
       #    desired_size = 2
-      #    start_time   = "2023-06-05T12:00:00Z"
+      #    start_time   = "2023-03-05T00:00:00Z"
       #    end_time     = "2024-03-05T00:00:00Z"
       #    timezone     = "Etc/GMT+0"
       #    recurrence   = "0 0 * * *"
@@ -298,7 +211,7 @@ module "eks" {
       #    min_size     = 0
       #    max_size     = "-1" # Retains current max size
       #    desired_size = 0
-      #    start_time   = "2023-06-05T12:00:00Z"
+      #    start_time   = "2023-03-05T12:00:00Z"
       #    end_time     = "2024-03-05T12:00:00Z"
       #    timezone     = "Etc/GMT+0"
       #    recurrence   = "0 12 * * *"
@@ -306,7 +219,7 @@ module "eks" {
       #}
 
       tags = {
-        ExtraTag = "EKS managed node group complete example"
+        ExtraTag = "EKS managed node group okteto"
       }
     }
   }
@@ -320,31 +233,27 @@ module "eks" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 3.0"
+  version = "~> 4.0"
 
   name = local.name
   cidr = local.vpc_cidr
 
   azs             = local.azs
   private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k)]
-  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 8)]
-  intra_subnets   = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 20)]
+  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 48)]
+  intra_subnets   = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 52)]
 
-  enable_ipv6                     = false
-  assign_ipv6_address_on_creation = false
-  create_egress_only_igw          = true
+  enable_nat_gateway     = true
+  single_nat_gateway     = true
+  enable_ipv6            = true
+  create_egress_only_igw = true
 
-  public_subnet_ipv6_prefixes  = [0, 1, 2]
-  private_subnet_ipv6_prefixes = [3, 4, 5]
-  intra_subnet_ipv6_prefixes   = [6, 7, 8]
-
-  enable_nat_gateway   = true
-  single_nat_gateway   = true
-  enable_dns_hostnames = true
-
-  enable_flow_log                      = true
-  create_flow_log_cloudwatch_iam_role  = true
-  create_flow_log_cloudwatch_log_group = true
+  public_subnet_ipv6_prefixes                    = [0, 1, 2]
+  public_subnet_assign_ipv6_address_on_creation  = true
+  private_subnet_ipv6_prefixes                   = [3, 4, 5]
+  private_subnet_assign_ipv6_address_on_creation = true
+  intra_subnet_ipv6_prefixes                     = [6, 7, 8]
+  intra_subnet_assign_ipv6_address_on_creation   = true
 
   public_subnet_tags = {
     "kubernetes.io/role/elb" = 1
@@ -463,7 +372,7 @@ data "aws_ami" "eks_default" {
   }
 }
 
-#data "aws_ami" "eks_default_arm" {
+# data "aws_ami" "eks_default_arm" {
 #  most_recent = true
 #  owners      = ["amazon"]
 
@@ -473,12 +382,61 @@ data "aws_ami" "eks_default" {
 #  }
 #}
 
-#data "aws_ami" "eks_default_bottlerocket" {
+# data "aws_ami" "eks_default_bottlerocket" {
 #  most_recent = true
 #  owners      = ["amazon"]
 
 #  filter {
 #    name   = "name"
 #    values = ["bottlerocket-aws-k8s-${local.cluster_version}-x86_64-*"]
+#  }
+#}
+
+################################################################################
+# Tags for the ASG to support cluster-autoscaler scale up from 0
+################################################################################
+
+# locals {
+
+  # We need to lookup K8s taint effect from the AWS API value
+#  taint_effects = {
+#    NO_SCHEDULE        = "NoSchedule"
+#    NO_EXECUTE         = "NoExecute"
+#    PREFER_NO_SCHEDULE = "PreferNoSchedule"
+#  }
+
+#  cluster_autoscaler_label_tags = merge([
+#    for name, group in module.eks.eks_managed_node_groups : {
+#      for label_name, label_value in coalesce(group.node_group_labels, {}) : "${name}|label|${label_name}" => {
+#        autoscaling_group = group.node_group_autoscaling_group_names[0],
+#        key               = "k8s.io/cluster-autoscaler/node-template/label/${label_name}",
+#        value             = label_value,
+#      }
+#    }
+#  ]...)
+
+#  cluster_autoscaler_taint_tags = merge([
+#    for name, group in module.eks.eks_managed_node_groups : {
+#      for taint in coalesce(group.node_group_taints, []) : "${name}|taint|${taint.key}" => {
+#        autoscaling_group = group.node_group_autoscaling_group_names[0],
+#        key               = "k8s.io/cluster-autoscaler/node-template/taint/${taint.key}"
+#        value             = "${taint.value}:${local.taint_effects[taint.effect]}"
+#      }
+#    }
+#  ]...)
+
+ # cluster_autoscaler_asg_tags = merge(local.cluster_autoscaler_label_tags, local.cluster_autoscaler_taint_tags)
+#}
+
+# resource "aws_autoscaling_group_tag" "cluster_autoscaler_label_tags" {
+#  for_each = local.cluster_autoscaler_asg_tags
+
+#  autoscaling_group_name = each.value.autoscaling_group
+
+#  tag {
+#    key   = each.value.key
+#    value = each.value.value
+
+#    propagate_at_launch = false
 #  }
 #}
